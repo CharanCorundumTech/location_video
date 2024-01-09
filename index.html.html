@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Get Video location</title>
+    <meta name="viewport" content="width=device-width">
+</head>
+
+<body>
+<style>
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+body{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #aabbcc;
+  overflow: hidden; 
+}
+.wrapper{
+  position: relative;
+  top: -20px;
+  width: 750px;
+  height: 600px;
+  background: #fff;
+  padding: 34px;
+  /* border-radius: 6px; */
+  box-shadow: 0 10px 10px 10px rgba(0,0,0,0.2);
+}
+.wrapper h2{
+  position: relative;
+  font-size: 22px;
+  font-weight: 600;
+  color: #333;
+}
+.wrapper h2::before{
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 28px;
+  border-radius: 12px;
+  background: rgb(0, 0, 0);
+}
+.wrapper h3{
+  position: relative;
+  top: 30px;
+  left: 75px;
+  font-size: 18px;
+  font-weight: 600;
+  color: rgb(39, 39, 39);
+}
+.wrapper h4{
+  position: relative;
+  top: 450px;
+  left: 15px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+.wrapper form{
+  margin-top: 30px;
+}
+.wrapper form .input-box{
+  height: 52px;
+  margin: 18px 0;
+}
+form .input-box input{
+  height: 100%;
+  width: 100%;
+  outline: none;
+  padding: 0 15px;
+  font-size: 17px;
+  font-weight: 400;
+  color: #333;
+  border: 1.5px solid #C7BEBE;
+  border-bottom-width: 2.5px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+.input-box input:focus,
+.input-box input:valid{
+  border-color: #000000;
+}
+form .policy{
+  display: flex;
+  align-items: center;
+}
+form h3{
+  color: #707070;
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 10px;
+}
+.input-box.button input{
+  color: #fff;
+  letter-spacing: 1px;
+  border: none;
+  background: #000000;
+  cursor: pointer;
+}
+.input-box.button input:hover{
+  background: rgb(42, 42, 42);
+}
+form .text h3{
+  color: #333;
+  width: 100%;
+  text-align: center;
+}
+form .text h3 a{
+  color: rgb(0, 0, 0);
+  text-decoration: none;
+  font-weight: bold;
+}
+form .text h3 a:hover{
+  text-decoration: underline;
+}
+.btn {
+  border-radius: 5px;
+    border: 1px solid #000000;
+    background-color: #000000;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 80ms ease-in;
+  position: relative;
+  /* right: 373px; */
+  /* top: 210px; */
+}
+
+.btn:active {
+    transform: scale(0.95);
+}
+.p{
+  margin-top: 50px;
+  height: 150px ;
+  width: 600px;
+}
+</style>
+
+{% csrf_token %}
+<div class="wrapper">
+    <h2>Video And Location Tracing</h2>
+    <h3>Please record a 10 seconds video of your office premises</h3>
+    <h4>Note: Please provide location access, keep your camera steady and record in a well-lit room </h4>
+    <button type="button"  class="btn"  id="btnStart" style="top:510px;left:225px;" onclick="style.display = 'none'">Start Recording</button>
+    <video width="550" height="550" style="position:relative;bottom:100px;left:60px;" id="btnStart" autoplay="autoplay">
+    </video>
+    <div id="count" style="font-family: 'Poppins', sans-serif;font-size: 30px;font-weight:bold;position:relative;bottom:200px;left:325px;"></div>
+
+</div>
+<div class="p">
+  <p id="location_info"></p>
+
+</div>
+
+<input hidden type="text" id="latitude" name="latitude" />
+<input hidden type="text" id="longitude" name="longitude" />
+
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+
+<script>
+    permission_denied=null
+    loc_permission_denied=null
+  $('#btnStart').click(function(){
+    if(permission_denied || loc_permission_denied){
+        alert("Please Allow Camera Access and location")
+
+    }else{
+    var counter = 10;
+    setInterval(function() {
+    counter--;
+    if (counter >= 0) {
+    span = document.getElementById("count");
+    span.innerHTML = counter;
+  }
+  }, 1000);
+}
+  });
+</script>
+
+<script>
+    $('#btnStart').click(function(){
+    var delay = 12100; //Your delay in milliseconds
+    setTimeout(function(){ window.location = 'final'; }, delay);
+    console.log('redirect function executed')
+    });
+</script>
+
+
+    <script>
+        
+        let constraintObj = { 
+            audio: false, 
+            video: { 
+                facingMode: "user", 
+                width: { min: 640, ideal: 1280, max: 1920 },
+                height: { min: 480, ideal: 720, max: 1080 } 
+            } 
+        }; 
+        // width: 1280, height: 720  -- preference only
+        // facingMode: {exact: "user"}
+        // facingMode: "environment"
+        
+        //handle older browsers that might implement getUserMedia in some way
+        if (navigator.mediaDevices === undefined) {
+            navigator.mediaDevices = {};
+            navigator.mediaDevices.getUserMedia = function(constraintObj) {
+                let getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+                if (!getUserMedia) {
+                    return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+                }
+                return new Promise(function(resolve, reject) {
+                    getUserMedia.call(navigator, constraintObj, resolve, reject);
+                });
+            }
+        }else{
+            navigator.mediaDevices.enumerateDevices()
+            .then(devices => {
+                devices.forEach(device=>{
+                    console.log(device.kind.toUpperCase(), device.label);
+                    //, device.deviceId
+                })
+            })
+            .catch(err=>{
+                console.log(err.name, err.message);
+            })
+        }
+
+        navigator.mediaDevices.getUserMedia(constraintObj)
+        .then(function(mediaStreamObj) {
+            //connect the media stream to the first video element
+            let video = document.querySelector('video');
+            if ("srcObject" in video) {
+                video.srcObject = mediaStreamObj;
+            } else {
+                //old version
+                video.src = window.URL.createObjectURL(mediaStreamObj);
+            }
+            
+            video.onloadedmetadata = function(ev) {
+                //show in the video element what is being captured by the webcam
+                video.play();
+            };
+            
+            //add listeners for saving video/audio
+            let start = document.getElementById('btnStart');
+            // let stop = document.getElementById('btnStop');
+            let vidSave = document.getElementById('vid2');
+            let mediaRecorder = new MediaRecorder(mediaStreamObj);
+            let chunks = [];
+            
+            start.addEventListener('click', (ev)=>{
+                mediaRecorder.start();
+                console.log(mediaRecorder.state);
+                tim = setTimeout(stopCam, 11000)
+                
+            })
+            const stopCam = () => {
+            let stream = video.srcObject;
+            let tracks = stream.getTracks();
+            tracks.forEach((track) => track.stop());
+            video.srcObject = null;
+            };
+
+
+            // stop.addEventListener('click', (ev)=>{
+            //     mediaRecorder.stop();
+            //     console.log(mediaRecorder.state);
+            mediaRecorder.ondataavailable = function(ev) {
+                chunks.push(ev.data);
+            }
+            mediaRecorder.onstop = (ev)=>{
+                // var def = new FileReader();
+                var fd = new FormData()
+                var req = new XMLHttpRequest();
+                req.open('POST', '', true);
+                req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                // req.responseType = 'blob';
+                blob = new Blob(chunks, { 'type' : 'video/mp4;' });
+                fd.append("webmasterfile", blob);
+                chunks = [];
+                
+                var reader = new FileReader();
+                reader.readAsDataURL(blob); 
+                reader.onloadend = function() {
+                var base64data = reader.result;   
+                base64data = base64data.replace("data:video/mp4;;base64,", "").replace("==", "")  
+                 
+                console.log("Video Data===",base64data);
+                req.setRequestHeader("X-CSRFToken", '{{csrf_token}}'); 
+                req.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
+                req.send(base64data);
+
+                }
+            }
+        })
+                .catch(function(err) { 
+                    console.log("Permission Denied!",err.name, err.message); 
+                    permission_denied=true
+        });
+        
+        /*********************************
+        getUserMedia returns a Promise
+        resolve - returns a MediaStream Object
+        reject returns one of the following errors
+        AbortError - generic unknown cause
+        NotAllowedError (SecurityError) - user rejected permissions
+        NotFoundError - missing media track
+        NotReadableError - user permissions given but hardware/OS error
+        OverconstrainedError - constraint video settings preventing
+        TypeError - audio: false, video: false
+        *********************************/
+    </script>
+</body> 
+
+<body onload="getLocation()">
+  <div id="location_info"></div>
+  <input type="hidden" id="latitude" name="latitude">
+  <input type="hidden" id="longitude" name="longitude">
+
+  <script>
+      function getLocation() {
+          if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(showLocation, handleLocationError);
+          } else {
+              console.log("Geolocation is not supported by this browser.");
+          }
+      }
+
+      function showLocation(pos) {
+          var latitude = pos.coords.latitude;
+          var longitude = pos.coords.longitude;
+
+          var apiKey = 'AIzaSyD267yXVmV0NtR_cprpZLsxfC-0dD5ZQAU';
+          var apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
+
+          fetch(apiUrl)
+              .then(response => response.json())
+              .then(data => {
+                  if (data && data.results && data.results.length > 0) {
+                      var address = data.results[0].formatted_address;
+                      console.log('Address:', address);
+
+                      document.getElementById("location_info").innerHTML = `<p><span style="color:red; font-weight: 600 ">Your Location:</span></p><b>${address}</b>`;
+                      document.getElementById("latitude").value = latitude;
+                      document.getElementById("longitude").value = longitude;
+
+                      var request = new XMLHttpRequest();
+                      request.open('POST', 'get_location', true);
+                      request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                      request.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+
+                      var coordinates = latitude + ',' + longitude;
+                      request.send(coordinates);
+
+                      console.log("Coordinates sent:", coordinates);
+                  } else {
+                      console.log('Unable to retrieve address for the provided coordinates.');
+                  }
+              })
+              .catch(error => {
+                  console.log('Error fetching address:', error);
+              });
+      }
+
+      function handleLocationError(error) {
+          if (error.code === error.PERMISSION_DENIED) {
+              loc_permission_denied = true;
+              alert("Location permission denied. Unable to get location.");
+          }
+      }
+  </script>
+</body>
+
+
+
+
+</html>
